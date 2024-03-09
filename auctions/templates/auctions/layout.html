@@ -1,3 +1,5 @@
+<!-- layout.html -->
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -14,7 +16,13 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item active">
-                    <a class="nav-link btn btn-outline-success text-success" href="{% url 'index' %}">Active Listings</a>
+                    <a class="nav-link btn btn-outline-success text-success mr-2" href="{% url 'index' %}">Active Listings</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-success text-success" href="{% url 'watchlist' %}">Watchlist</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link btn btn-outline-success text-success ml-2" href="{% url 'category' %}">Categories</a>
                 </li>
             </ul>
             {% if user.is_authenticated %}
@@ -29,7 +37,7 @@
             {% else %}
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link btn btn-outline-success text-success" href="{% url 'login' %}">Log In</a>
+                        <a class="nav-link btn btn-outline-success text-success mr-2" href="{% url 'login' %}">Log In</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link btn btn-outline-success text-success" href="{% url 'register' %}">Register</a>
@@ -45,5 +53,3 @@
     </div>
 </body>
 </html>
-
-

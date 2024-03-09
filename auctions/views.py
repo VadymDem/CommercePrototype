@@ -3,6 +3,8 @@ from django.db import IntegrityError
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from .models import Watchlist
 from .models import Category, Listing
 from .models import User
 from .models import ListingForm
@@ -11,6 +13,12 @@ from .models import ListingForm
 def index(request):
     listings = Listing.objects.all()
     return render(request, 'auctions/index.html', {'listings': listings})
+
+
+def category_list(request):
+    category_id = request.GET.get('category_id')
+    categories = Category.objects.all()
+    return render(request, 'auctions/category_list.html', {'categories': categories})
 
 
 def login_view(request):
@@ -76,3 +84,27 @@ def create_listing(request):
     categories = Category.objects.all()
     return render(request, 'auctions/create_listing.html', {'form': form, 'categories': categories})
 
+
+def listing_detail(request, listing_id):
+    listing = get_object_or_404(Listing, pk=listing_id)
+    return render(request, 'auctions/listing_detail.html', {'listing': listing})
+
+
+def watchlist(request):
+    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+    context = {'watchlist': watchlist}
+    return render(request, 'auctions/watchlist.html', context)
+
+@login_required
+def add_to_watchlist(request, listing_id):
+    listing = Listing.objects.get(pk=listing_id)
+    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+    watchlist.listings.add(listing)
+    return redirect('watchlist')
+
+@login_required
+def remove_from_watchlist(request, listing_id):
+    listing = Listing.objects.get(pk=listing_id)
+    watchlist = Watchlist.objects.get(user=request.user)
+    watchlist.listings.remove(listing)
+    return redirect('watchlist')

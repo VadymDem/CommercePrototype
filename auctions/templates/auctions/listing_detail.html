@@ -1,0 +1,35 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    {{ listing.title }} - Auctions
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2>{{ listing.title }}</h2>
+            </div>
+            <div class="col-auto">
+                {% if user.is_authenticated %}
+                    <form action="{% url 'add_to_watchlist' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-success">Add to Watchlist</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        <p>Description: {{ listing.description }}</p>
+        <p>Current Price: {{ listing.current_price }}$</p>
+        <p>Number of Bids: {{ listing.bids.count }}</p>
+        <p>Bidders:</p>
+        <ul>
+            {% for bid in listing.bids.all %}
+                <li>{{ bid.user.username }} - {{ bid.amount }}</li>
+            {% endfor %}
+        </ul>
+        <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="max-width: 800px; max-height: 400px;">
+    </div>
+{% endblock %}
+
+

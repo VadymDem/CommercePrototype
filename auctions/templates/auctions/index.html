@@ -11,9 +11,13 @@
             {% for listing in listings %}
                 <div class="col-md-3">
                     <div class="card mb-4 shadow-sm listing-card">
-                        <img src="{{ listing.image_url }}" class="card-img-top img-fluid" alt="{{ listing.title }}">
+                        <a href="{% url 'listing_detail' listing.id %}">
+                            <img src="{{ listing.image_url }}" class="card-img-top img-fluid" alt="{{ listing.title }}">
+                        </a>
                         <div class="card-body">
-                            <h5 class="card-title">{{ listing.title }}</h5>
+                            <h5 class="card-title">
+                                <a href="{% url 'listing_detail' listing.id %}">{{ listing.title }}</a>
+                            </h5>
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-muted">Start Price: {{ listing.start_price }}$</small>
                             </div>
@@ -27,4 +31,3 @@
         </div>
     </div>
 {% endblock %}
-

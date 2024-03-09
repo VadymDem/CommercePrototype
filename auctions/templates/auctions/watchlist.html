@@ -1,0 +1,19 @@
+{% extends "auctions/layout.html" %}
+
+{% block title %}
+    Watchlist - Auctions
+{% endblock %}
+
+{% block body %}
+    <div class="container">
+        <h2>Your Watchlist</h2>
+        <ul class="list-group">
+            {% for listing in watchlist.listings.all %}
+                <li class="list-group-item">
+                    <a href="{% url 'listing_detail' listing.id %}">{{ listing.title }}</a>
+                    <a href="{% url 'remove_from_watchlist' listing.id %}" class="btn btn-danger btn-sm float-right">Remove from Watchlist</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}
