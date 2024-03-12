@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Watchlist
-from .models import Category, Listing, WonAuction, Bid
+from .models import Category, Listing, WonAuction, Bid, Comment
 from .models import User
 from .models import ListingForm
 
@@ -95,12 +95,14 @@ def watchlist(request):
     context = {'watchlist': watchlist}
     return render(request, 'auctions/watchlist.html', context)
 
+
 @login_required
 def add_to_watchlist(request, listing_id):
     listing = Listing.objects.get(pk=listing_id)
     watchlist, created = Watchlist.objects.get_or_create(user=request.user)
     watchlist.listings.add(listing)
     return redirect('watchlist')
+
 
 @login_required
 def remove_from_watchlist(request, listing_id):
@@ -171,3 +173,14 @@ def close_auction(request, listing_id):
             return render(request, 'auctions/error.html', {'error_message': 'Only the owner can close the auction.'})
     else:
         return render(request, 'auctions/error.html', {'error_message': 'Invalid request method.'})
+
+
+@login_required
+def add_comment(request, listing_id):
+    if request.method == 'POST':
+        text = request.POST.get('comment')
+        user = request.user
+        listing = Listing.objects.get(pk=listing_id)
+        comment = Comment.objects.create(auction=listing, user=user, text=text)
+        comment.save()
+    return redirect('listing_detail', listing_id=listing_id)

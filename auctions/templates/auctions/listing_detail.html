@@ -43,5 +43,33 @@
         </ul>
 
         <img src="{{ listing.image_url }}" alt="{{ listing.title }}" style="max-width: 800px; max-height: 400px;">
+    
+        {% if user.is_authenticated %}
+            <form action="{% url 'add_comment' listing.id %}" method="post" class="mt-4">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="comment">Add a Comment:</label>
+                    <textarea class="form-control" id="comment" name="comment" rows="3" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+        {% else %}
+            <div class="mt-4">
+                <p class="alert alert-info">Please <a href="{% url 'login' %}">log in</a> or <a href="{% url 'register' %}">register</a> to leave a comment.</p>
+            </div>
+        {% endif %}
+        <div class="mt-4">
+            <h3 class="my-3">Comments:</h3>
+            <ul class="list-unstyled">
+                {% for comment in listing.comments.all %}
+                    <li class="mb-3">
+                        <p class="mb-1">{{ comment.text }}</p>
+                        <small class="text-muted">By: {{ comment.user.username }} - {{ comment.comment_date }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
     </div>
+    
 {% endblock %}

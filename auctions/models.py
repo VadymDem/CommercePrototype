@@ -61,7 +61,7 @@ class AuctionList(models.Model):
 
 
 class Comment(models.Model):
-    auction = models.ForeignKey(AuctionList, on_delete=models.CASCADE)
+    auction = models.ForeignKey(Listing, related_name='comments', on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     text = models.TextField()
     comment_date = models.DateTimeField(auto_now_add=True)
