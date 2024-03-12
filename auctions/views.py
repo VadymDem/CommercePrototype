@@ -15,12 +15,6 @@ def index(request):
     return render(request, 'auctions/index.html', {'listings': listings})
 
 
-def category_list(request):
-    category_id = request.GET.get('category_id')
-    categories = Category.objects.all()
-    return render(request, 'auctions/category_list.html', {'categories': categories})
-
-
 def login_view(request):
     if request.method == "POST":
 
@@ -108,3 +102,14 @@ def remove_from_watchlist(request, listing_id):
     watchlist = Watchlist.objects.get(user=request.user)
     watchlist.listings.remove(listing)
     return redirect('watchlist')
+
+
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'auctions/category_list.html', {'categories': categories})
+
+
+def category_render(request, category_id):
+    category = get_object_or_404(Category, id=category_id)
+    listings = Listing.objects.filter(category=category)
+    return render(request, 'auctions/category_render.html', {'category': category, 'listings': listings})
