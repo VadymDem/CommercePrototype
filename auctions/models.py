@@ -12,6 +12,8 @@ class Category(models.Model):
 
 
 class Listing(models.Model):
+    closed = models.BooleanField(default=False)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.TextField()
     start_price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -69,7 +71,20 @@ class Watchlist(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     listings = models.ManyToManyField('Listing', blank=True)
 
-    def __str__(self):
-        return f"Watchlist for {self.user.username}"
+
+class WonAuction(models.Model):
+    winner = models.ForeignKey(User, on_delete=models.CASCADE)
+    listing_title = models.CharField(max_length=100)
+    listing_description = models.TextField()
+    listing_start_price = models.DecimalField(max_digits=10, decimal_places=2)
+    listing_image_url = models.URLField()
+    winning_bid = models.DecimalField(max_digits=10, decimal_places=2)
+    date_won = models.DateTimeField(auto_now_add=True)
+
+
+
+
+
+
 
 

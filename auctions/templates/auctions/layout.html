@@ -29,6 +29,9 @@
                 </form>
                 <ul class="navbar-nav ml-auto">
                     <li class="nav-item">
+                        <span class="navbar-text text-success mr-2">Welcome, {{ user.username }}</span>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link btn btn-outline-success text-success" href="{% url 'logout' %}">Log Out</a>
                     </li>
                 </ul>
@@ -45,7 +48,7 @@
         </div>
     </nav>
     <hr>
-    <div class="container">
+    <div class="container-fluid">
         {% block body %}
         {% endblock %}
     </div>

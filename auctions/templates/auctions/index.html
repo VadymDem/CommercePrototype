@@ -5,29 +5,44 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        <h2>Active Listings</h2>
+    <div class="container-fluid">
         <div class="row">
-            {% for listing in listings %}
+            {% if user.is_authenticated %}
                 <div class="col-md-3">
-                    <div class="card mb-4 shadow-sm listing-card">
-                        <a href="{% url 'listing_detail' listing.id %}">
-                            <img src="{{ listing.image_url }}" class="card-img-top img-fluid" alt="{{ listing.title }}">
-                        </a>
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                <a href="{% url 'listing_detail' listing.id %}">{{ listing.title }}</a>
-                            </h5>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">Start Price: {{ listing.start_price }}$</small>
+                    <h4 class="mb-3">Won Auctions</h4>
+                    <ul class="list-group">
+                        {% for won_auction in user.wonauction_set.all %}
+                            <li class="list-group-item">{{ won_auction.listing_title }}, Winning Bid: {{ won_auction.winning_bid }}$</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="col-md-9">
+                <h2>Active Listings</h2>
+                <div class="row">
+                    {% for listing in listings %}
+                        <div class="col-md-3">
+                            <div class="card mb-4 shadow-sm listing-card">
+                                <a href="{% url 'listing_detail' listing.id %}">
+                                    <img src="{{ listing.image_url }}" class="card-img-top img-fluid" alt="{{ listing.title }}">
+                                </a>
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <a href="{% url 'listing_detail' listing.id %}">{{ listing.title }}</a>
+                                    </h5>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <small class="text-muted">Start Price: {{ listing.start_price }}$</small>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                        {% if forloop.counter|divisibleby:4 %}
+                            </div><div class="row">
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                {% if forloop.counter|divisibleby:4 %}
-                    </div><div class="row">
-                {% endif %}
-            {% endfor %}
+            </div>
         </div>
     </div>
 {% endblock %}

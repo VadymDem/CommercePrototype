@@ -1,11 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Watchlist
-from .models import Category, Listing
+from .models import Category, Listing, WonAuction, Bid
 from .models import User
 from .models import ListingForm
 
@@ -67,11 +67,17 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+@login_required  # Декоратор, чтобы проверить, что пользователь аутентифицирован
 def create_listing(request):
     if request.method == 'POST':
         form = ListingForm(request.POST)
         if form.is_valid():
-            form.save()
+            # Получаем текущего пользователя
+            owner = request.user
+            # Присваиваем текущего пользователя как владельца объявления
+            listing = form.save(commit=False)
+            listing.owner = owner
+            listing.save()
             return HttpResponseRedirect(reverse("index"))
     else:
         form = ListingForm()
@@ -113,3 +119,55 @@ def category_render(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     listings = Listing.objects.filter(category=category)
     return render(request, 'auctions/category_render.html', {'category': category, 'listings': listings})
+
+
+@login_required
+def place_bid(request, listing_id):
+    listing = Listing.objects.get(pk=listing_id)
+
+    if request.method == 'POST':
+        bid_amount = request.POST.get('bid_amount')
+        if bid_amount:
+            bid_amount = float(bid_amount)
+            if bid_amount > listing.current_price:  # Ensure bid is higher than current price
+                bid = Bid(listing=listing, user=request.user, amount=bid_amount)
+                bid.save()
+                return redirect('listing_detail', listing_id=listing_id)
+            else:
+                return render(request, 'auctions/error.html',
+                              {'error_message': 'Your bid must be higher than the current price.'})
+
+    return render(request, 'auctions/listing_detail.html', {'listing': listing})
+
+
+@login_required
+def close_auction(request, listing_id):
+    listing = Listing.objects.get(pk=listing_id)
+
+    if request.method == 'POST':
+        if request.user == listing.owner:
+            winner_bid = listing.bids.order_by('-amount').first()
+            if winner_bid:
+                winner = winner_bid.user
+                winning_bid = winner_bid.amount
+            else:
+                winner = None
+                winning_bid = 0
+
+            if winner:
+                won_auction = WonAuction(winner=winner, listing_title=listing.title,
+                                         listing_description=listing.description,
+                                         listing_start_price=listing.start_price,
+                                         listing_image_url=listing.image_url,
+                                         winning_bid=winning_bid)
+                won_auction.save()
+
+                listing.delete()
+
+                return redirect('index')
+            else:
+                return HttpResponseForbidden("Auction cannot be closed without a winner.")
+        else:
+            return render(request, 'auctions/error.html', {'error_message': 'Only the owner can close the auction.'})
+    else:
+        return render(request, 'auctions/error.html', {'error_message': 'Invalid request method.'})
